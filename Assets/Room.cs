@@ -1,8 +1,4 @@
-﻿using UnityEngine;
-using System;
-using System.Collections;
-
-class Room
+﻿class Room
 {
     private int x, y, width, height;
 
@@ -34,5 +30,23 @@ class Room
             }
         }
         return false;
+    }
+
+    public bool RoomCollides(Room _checkRoom)
+    {
+
+        bool bottomLeft = RoomContains(_checkRoom.X, _checkRoom.Y);
+        bool bottomRight = RoomContains(_checkRoom.Width, _checkRoom.Y);
+        bool topLeft = RoomContains(_checkRoom.X, _checkRoom.Height);
+        bool topRight = RoomContains(_checkRoom.Width, _checkRoom.Height);
+
+        if (bottomLeft || bottomRight || topLeft || topRight)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }

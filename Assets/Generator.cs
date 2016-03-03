@@ -1,16 +1,17 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System;
 
 public class Generator : MonoBehaviour {
     [Header("Generator Properties")]
-    public int width = 20, height = 20;
-    public int tileSize = 40;
+    private const int WIDTH = 20, HEIGHT = 20;
+    private const int TILE_SIZE = 40;
 
     [Header("Room Properties")]
-    public int roomsToSpawn = 3;
-    public int minRoomSize = 3, maxRoomSize = 10;
+    private int roomsToSpawn = 3;
+    private int maxRoomTries = 100;
+    private int minRoomSize = 3, maxRoomSize = 10;
 
     [Header("Tile Prefabs")]
     public GameObject[] CoridoorTiles;
@@ -31,17 +32,19 @@ public class Generator : MonoBehaviour {
 
     void Generate()
     {
-        cells = new Cell[width, height];
-        for (int y = 0; y < height; y++)
+        cells = new Cell[WIDTH, HEIGHT];
+        for (int y = 0; y < HEIGHT; y++)
         {
-            for (int x = 0; x < width; x++)
+            for (int x = 0; x < WIDTH; x++)
             {
                 cells[x, y] = new Cell();
             }
         }
-        Rooms.Add(new Room(4, 4, 7, 7));
-        /*
+        // Rooms.Add(new Room(4, 4, 5, 8));
+        // Rooms.Add(new Room(6, 8, 13, 17));
+
         GenerateRooms();
+        /*
         GenerateCoridoors();
         MakeDoors();
         */
@@ -52,14 +55,16 @@ public class Generator : MonoBehaviour {
     private void MakeTiles()
     {
         Vector3 spawnPos;
-        int SpawnOrientation;
-        GameObject newTile;
+        int spawnOrientation = 0;
+        GameObject newTile = CoridoorTiles[0];
         Cell currentCell;
-        for (int y = 0; y < height; y++)
+        for (int y = 0; y < HEIGHT; y++)
         {
-            for (int x = 0; x < width; x++)
+            for (int x = 0; x < WIDTH; x++)
             {
-                spawnPos = new Vector3(x * tileSize, 0, y * tileSize);
+                spawnPos = new Vector3(x * TILE_SIZE, 0, y * TILE_SIZE);
+                spawnOrientation = 0;
+                newTile = null;
                 currentCell = cells[x, y];
                 Room currentRoom = null;
                 foreach (Room checkRoom in Rooms)
@@ -72,23 +77,50 @@ public class Generator : MonoBehaviour {
                 }
                 if (currentRoom != null)
                 {
-                    if (y == currentRoom.Y)
+                    if (x == currentRoom.X && y == currentRoom.Y)
                     {
-                        if (x == currentRoom.X)
-                        {
-                            newTile = RoomTiles[8];
-                            SpawnOrientation = 0;
-                        }
-                        else if (x == currentRoom.Width)
-                        {
-                            newTile = RoomTiles[8];
-                            SpawnOrientation = 3;
-                        }
-                        else
-                        {
-                            newTile = RoomTiles[5];
-                            SpawnOrientation = 
-                        }
+                        newTile = RoomTiles[8];
+                        spawnOrientation = 3;
+                    }
+                    else if (x == currentRoom.X && y == currentRoom.Height)
+                    {
+                        newTile = RoomTiles[8];
+                        spawnOrientation = 0;
+                    }
+                    else if (x == currentRoom.Width && y == currentRoom.Y)
+                    {
+                        newTile = RoomTiles[8];
+                        spawnOrientation = 2;
+                    }
+                    else if (x == currentRoom.Width && y == currentRoom.Height)
+                    {
+                        newTile = RoomTiles[8];
+                        spawnOrientation = 1;
+                    }
+                    else if (x == currentRoom.X)
+                    {
+                        newTile = RoomTiles[5];
+                        spawnOrientation = 3;
+                    }
+                    else if (x == currentRoom.Width)
+                    {
+                        newTile = RoomTiles[5];
+                        spawnOrientation = 1;
+                    }
+                    else if (y == currentRoom.Y)
+                    {
+                        newTile = RoomTiles[5];
+                        spawnOrientation = 2;
+                    }
+                    else if (y == currentRoom.Height)
+                    {
+                        newTile = RoomTiles[5];
+                        spawnOrientation = 0;
+                    }
+                    else
+                    {
+                        newTile = RoomTiles[0];
+                        spawnOrientation = UnityEngine.Random.Range(0, 4);
                     }
                 }
                 else
@@ -122,7 +154,7 @@ public class Generator : MonoBehaviour {
                             break;
                     }
                 }
-                Instantiate(newTile, spawnPos, Quaternion.identity);
+                Instantiate(newTile, spawnPos, Quaternion.Euler(0f, 90*spawnOrientation ,0f));
             }
         }
     }
@@ -139,6 +171,39 @@ public class Generator : MonoBehaviour {
 
     private void GenerateRooms()
     {
-        throw new NotImplementedException();
+        for (int i = 0; i < roomsToSpawn; i++)
+        {
+            int tryCounter = maxRoomTries;
+            while (tryCounter > 0)
+            {
+                int xPos = UnityEngine.Random.Range(0, WIDTH - minRoomSize);
+                int yPos = UnityEngine.Random.Range(0, HEIGHT - minRoomSize);
+                int roomWidth = UnityEngine.Random.Range(minRoomSize, maxRoomSize);
+                int roomHeight = UnityEngine.Random.Range(minRoomSize, maxRoomSize);
+
+                Room newRoom = new Room(xPos, yPos, roomWidth, roomHeight);
+
+                bool isValid = false;
+                foreach (Room currentRoom in Rooms)
+                {
+                    if (currentRoom.RoomCollides(newRoom))
+                    {
+                        isValid = false;
+                        break;
+                    }
+                    else
+                    {
+                        isValid = true;
+                    }
+                }
+
+                if (isValid)
+                {
+                    Rooms.Add(newRoom);
+                }
+
+                tryCounter--;
+            }
+        }
     }
 }
