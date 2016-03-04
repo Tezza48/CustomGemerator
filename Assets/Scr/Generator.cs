@@ -10,7 +10,7 @@ public class Generator : MonoBehaviour {
 
     [Header("Room Properties")]
     private int roomsToSpawn = 3;
-    private int maxRoomTries = 100;
+    private int maxRoomTries = 1000;
     private int minRoomSize = 3, maxRoomSize = 10;
 
     [Header("Tile Prefabs")]
@@ -183,9 +183,10 @@ public class Generator : MonoBehaviour {
 
                 Room newRoom = new Room(xPos, yPos, roomWidth, roomHeight);
 
-                bool isValid = false;
+                bool isValid = true;
                 foreach (Room currentRoom in Rooms)
                 {
+                    /*
                     if (currentRoom.RoomCollides(newRoom))
                     {
                         isValid = false;
@@ -195,11 +196,22 @@ public class Generator : MonoBehaviour {
                     {
                         isValid = true;
                     }
+                    */
+                    if (currentRoom.X < newRoom.Width && currentRoom.Width > newRoom.X && currentRoom.Y > newRoom.Height && currentRoom.Height < newRoom.Y)
+                    {
+                        isValid = true;
+                    }
+                    else
+                    {
+                        isValid = false;
+                        break;
+                    }
                 }
 
                 if (isValid)
                 {
                     Rooms.Add(newRoom);
+                    Debug.Log(isValid.ToString() + newRoom.X + ", "  + newRoom.Y + ", " + newRoom.Width + ", " + newRoom.Height);
                 }
 
                 tryCounter--;
