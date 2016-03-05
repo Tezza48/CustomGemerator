@@ -3,14 +3,24 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+enum MazeTiles
+{
+    Filler, Deadend, Corner, Straight, Junction, Cross
+}
+
+enum RoomTiles
+{
+    Corner = 8, Centre = 0, Edge = 5
+}
+
 public class Generator : MonoBehaviour {
     [Header("Generator Properties")]
     private const int WIDTH = 20, HEIGHT = 20;
     private const int TILE_SIZE = 40;
 
     [Header("Room Properties")]
-    private int roomsToSpawn = 3;
-    private int maxRoomTries = 1000;
+    private int roomsToSpawn = 5;
+    private int maxRoomTries = 10;
     private int minRoomSize = 3, maxRoomSize = 10;
 
     [Header("Tile Prefabs")]
@@ -40,10 +50,9 @@ public class Generator : MonoBehaviour {
                 cells[x, y] = new Cell();
             }
         }
-        // Rooms.Add(new Room(4, 4, 5, 8));
-        // Rooms.Add(new Room(6, 8, 13, 17));
+        // Rooms.Add(new Room(4, 4, 3, 3));
 
-        GenerateRooms();
+         GenerateRooms();
         /*
         GenerateCoridoors();
         MakeDoors();
@@ -77,77 +86,34 @@ public class Generator : MonoBehaviour {
                 }
                 if (currentRoom != null)
                 {
-                    if (x == currentRoom.X && y == currentRoom.Y)
-                    {
-                        newTile = RoomTiles[8];
-                        spawnOrientation = 3;
-                    }
-                    else if (x == currentRoom.X && y == currentRoom.Height)
-                    {
-                        newTile = RoomTiles[8];
-                        spawnOrientation = 0;
-                    }
-                    else if (x == currentRoom.Width && y == currentRoom.Y)
-                    {
-                        newTile = RoomTiles[8];
-                        spawnOrientation = 2;
-                    }
-                    else if (x == currentRoom.Width && y == currentRoom.Height)
-                    {
-                        newTile = RoomTiles[8];
-                        spawnOrientation = 1;
-                    }
-                    else if (x == currentRoom.X)
-                    {
-                        newTile = RoomTiles[5];
-                        spawnOrientation = 3;
-                    }
-                    else if (x == currentRoom.Width)
-                    {
-                        newTile = RoomTiles[5];
-                        spawnOrientation = 1;
-                    }
-                    else if (y == currentRoom.Y)
-                    {
-                        newTile = RoomTiles[5];
-                        spawnOrientation = 2;
-                    }
-                    else if (y == currentRoom.Height)
-                    {
-                        newTile = RoomTiles[5];
-                        spawnOrientation = 0;
-                    }
-                    else
-                    {
-                        newTile = RoomTiles[0];
-                        spawnOrientation = UnityEngine.Random.Range(0, 4);
-                    }
+                    RoomTiles tile = currentRoom.CheckPosition(ref spawnOrientation, x, y);
+                    newTile = RoomTiles[(int)tile];
                 }
                 else
                 {
                     switch (currentCell.getNumExits())
                     {
                         case 0:
-                            newTile = CoridoorTiles[0];
+                            newTile = CoridoorTiles[(int)MazeTiles.Filler];
                             break;
                         case 1:
-                            newTile = CoridoorTiles[1];
+                            newTile = CoridoorTiles[(int)MazeTiles.Deadend];
                             break;
                         case 2:
                             if (currentCell.Exits == 10 || currentCell.Exits == 5)
                             {
-                                newTile = CoridoorTiles[3];
+                                newTile = CoridoorTiles[(int)MazeTiles.Straight];
                             }
                             else
                             {
-                                newTile = CoridoorTiles[2];
+                                newTile = CoridoorTiles[(int)MazeTiles.Corner];
                             }
                             break;
                         case 3:
-                            newTile = CoridoorTiles[4];
+                            newTile = CoridoorTiles[(int)MazeTiles.Junction];
                             break;
                         case 4:
-                            newTile = CoridoorTiles[5];
+                            newTile = CoridoorTiles[(int)MazeTiles.Cross];
                             break;
                         default:
                             newTile = new GameObject("Error Tile");
@@ -183,10 +149,14 @@ public class Generator : MonoBehaviour {
 
                 Room newRoom = new Room(xPos, yPos, roomWidth, roomHeight);
 
+                if (xPos + roomWidth > WIDTH || yPos + roomHeight > HEIGHT)
+                {
+                    continue;
+                }
+
                 bool isValid = true;
                 foreach (Room currentRoom in Rooms)
                 {
-                    /*
                     if (currentRoom.RoomCollides(newRoom))
                     {
                         isValid = false;
@@ -196,22 +166,13 @@ public class Generator : MonoBehaviour {
                     {
                         isValid = true;
                     }
-                    */
-                    if (currentRoom.X < newRoom.Width && currentRoom.Width > newRoom.X && currentRoom.Y > newRoom.Height && currentRoom.Height < newRoom.Y)
-                    {
-                        isValid = true;
-                    }
-                    else
-                    {
-                        isValid = false;
-                        break;
-                    }
                 }
 
                 if (isValid)
                 {
                     Rooms.Add(newRoom);
                     Debug.Log(isValid.ToString() + newRoom.X + ", "  + newRoom.Y + ", " + newRoom.Width + ", " + newRoom.Height);
+                    break;
                 }
 
                 tryCounter--;

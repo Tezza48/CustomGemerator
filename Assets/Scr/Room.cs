@@ -1,4 +1,7 @@
-﻿class Room
+﻿using UnityEngine;
+using System.Collections.Generic;
+
+class Room
 {
     private int x, y, width, height;
 
@@ -22,14 +25,65 @@
 
     public bool RoomContains(int _x, int _y)
     {
-        if (_x >= x && _x <= width)
+        if (_x >= x && _x <= x + width)
         {
-            if (_y >= y && _y <= height)
+            if (_y >= y && _y <= y + height)
             {
                 return true;
             }
         }
         return false;
+    }
+
+    public RoomTiles CheckPosition(ref int orientation, int _x, int _y)
+    {
+        RoomTiles tile = RoomTiles.Centre;
+        // if corner
+        if (_x == x && _y == y)
+        {
+            orientation = 3;
+            return RoomTiles.Corner;
+        }
+        else if (_x == x + width && _y == y)
+        {
+            orientation = 2;
+            return RoomTiles.Corner;
+        }
+        else if (_x == x && _y == y + height)
+        {
+            orientation = 0;
+            return RoomTiles.Corner;
+        }
+        else if (_x == x + width && _y == y + height)
+        {
+            orientation = 1;
+            return RoomTiles.Corner;
+        }
+
+        // if edge
+        else if (_x == x)
+        {
+            orientation = 3;
+            return RoomTiles.Edge;
+        }
+        else if (_y == y)
+        {
+            orientation = 2;
+            return RoomTiles.Edge;
+        }
+        else if (_x == x + width)
+        {
+            orientation = 1;
+            return RoomTiles.Edge;
+        }
+        else if (_y == y + height)
+        {
+            orientation = 0;
+            return RoomTiles.Edge;
+        }
+        //else centre
+        orientation = UnityEngine.Random.Range(0, 4);
+        return tile;
     }
 
     public bool RoomCollides(Room _checkRoom)
