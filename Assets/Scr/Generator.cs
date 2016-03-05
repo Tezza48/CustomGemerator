@@ -14,16 +14,18 @@ enum RoomTiles
 }
 
 public class Generator : MonoBehaviour {
-    [Header("Generator Properties")]
-    private const int WIDTH = 20, HEIGHT = 20;
+    [Header("Generator Fields")]
+    [SerializeField][Range(5, 50)] private int WIDTH = 40;
+    [SerializeField][Range(5, 50)] private int HEIGHT = 40;
     private const int TILE_SIZE = 40;
 
-    [Header("Room Properties")]
-    private int roomsToSpawn = 5;
-    private int maxRoomTries = 10;
-    private int minRoomSize = 3, maxRoomSize = 10;
+    [Header("Room Fields")]
+    [SerializeField][Range(5, 20)] private int roomsToSpawn = 13;
+    private int maxRoomTries = 100;
+    private int minRoomSize = 3;
+    [SerializeField][Range(8, 20)] private int maxRoomSize = 8;
 
-    [Header("Tile Prefabs")]
+    [Header("Tile Fields")]
     public GameObject[] CoridoorTiles;
     public GameObject[] RoomTiles;
 
@@ -120,7 +122,8 @@ public class Generator : MonoBehaviour {
                             break;
                     }
                 }
-                Instantiate(newTile, spawnPos, Quaternion.Euler(0f, 90*spawnOrientation ,0f));
+                GameObject spawnedTile = (GameObject) Instantiate(newTile, spawnPos, Quaternion.Euler(0f, 90*spawnOrientation ,0f));
+                spawnedTile.name = "(" + x + ", " + y + ") " + newTile.name;
             }
         }
     }
@@ -149,7 +152,7 @@ public class Generator : MonoBehaviour {
 
                 Room newRoom = new Room(xPos, yPos, roomWidth, roomHeight);
 
-                if (xPos + roomWidth > WIDTH || yPos + roomHeight > HEIGHT)
+                if (xPos + roomWidth + 1 > WIDTH || yPos + roomHeight + 1 > HEIGHT)
                 {
                     continue;
                 }
@@ -157,21 +160,18 @@ public class Generator : MonoBehaviour {
                 bool isValid = true;
                 foreach (Room currentRoom in Rooms)
                 {
-                    if (currentRoom.RoomCollides(newRoom))
+                    if (newRoom.roomRect.Overlaps(currentRoom.roomRect))
                     {
                         isValid = false;
                         break;
                     }
-                    else
-                    {
-                        isValid = true;
-                    }
                 }
+
+                Debug.Log(isValid.ToString() + newRoom.X + ", "  + newRoom.Y + ", " + (newRoom.Width + newRoom.X).ToString() + ", " + (newRoom.Height + newRoom.Y).ToString());
 
                 if (isValid)
                 {
                     Rooms.Add(newRoom);
-                    Debug.Log(isValid.ToString() + newRoom.X + ", "  + newRoom.Y + ", " + newRoom.Width + ", " + newRoom.Height);
                     break;
                 }
 

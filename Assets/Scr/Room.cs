@@ -13,6 +13,8 @@ class Room
     public int X { get { return x; } }
 
     public int Y { get { return y; } }
+
+    public Rect roomRect { get { return new Rect(x-1, y-1, width+1, height+1);  } }
     #endregion
 
     public Room(int _x, int _y, int _width, int _height)
@@ -86,7 +88,7 @@ class Room
         return tile;
     }
 
-    public bool RoomCollides(Room _checkRoom)
+    public bool DoesOverlap(Room _checkRoom)
     {
 
         bool bottomLeft = RoomContains(_checkRoom.X, _checkRoom.Y);
