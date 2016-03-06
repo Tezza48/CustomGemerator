@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
 
 class Room
 {
     private int x, y, width, height;
+
+    private Vector2 origin;
 
     #region Properties
     public int Height { get { return height; } }
@@ -14,7 +15,9 @@ class Room
 
     public int Y { get { return y; } }
 
-    public Rect roomRect { get { return new Rect(x-1, y-1, width+1, height+1);  } }
+    public Rect RoomRect { get { return new Rect(x-1, y-1, width+2, height+2);  } }
+
+    public Vector2 Origin { get { return origin; } }
     #endregion
 
     public Room(int _x, int _y, int _width, int _height)
@@ -23,6 +26,7 @@ class Room
         y = _y;
         width = _width;
         height = _height;
+        origin = new Vector2( x + (width / 2), y + (height/2) );
     }
 
     public bool RoomContains(int _x, int _y)

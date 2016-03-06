@@ -54,9 +54,9 @@ public class Generator : MonoBehaviour {
         }
         // Rooms.Add(new Room(4, 4, 3, 3));
 
-         GenerateRooms();
+        GenerateRooms();
+        GenerateCoridoors(Rooms);
         /*
-        GenerateCoridoors();
         MakeDoors();
         */
 
@@ -133,9 +133,25 @@ public class Generator : MonoBehaviour {
         throw new NotImplementedException();
     }
 
-    private void GenerateCoridoors()
+    private void GenerateCoridoors(List<Room> _Rooms)
     {
-        throw new NotImplementedException();
+        List<Line> hallways = new List<Line>();
+        while(_Rooms.Count > 1)
+        {
+            Room currentRoom = _Rooms[0];
+            _Rooms.RemoveAt(0);
+            Room lastClosestRoom;
+            float shortestDistance = Mathf.Infinity;
+            foreach (Room checkRoom in _Rooms)
+            {
+                float distance = (int)Vector2.Distance(currentRoom.Origin, checkRoom.Origin);
+                if (distance < shortestDistance)
+                {
+                    shortestDistance = distance;
+                    lastClosestRoom = checkRoom;
+                }
+            }
+        }
     }
 
     private void GenerateRooms()
@@ -160,7 +176,7 @@ public class Generator : MonoBehaviour {
                 bool isValid = true;
                 foreach (Room currentRoom in Rooms)
                 {
-                    if (newRoom.roomRect.Overlaps(currentRoom.roomRect))
+                    if (newRoom.RoomRect.Overlaps(currentRoom.RoomRect))
                     {
                         isValid = false;
                         break;
