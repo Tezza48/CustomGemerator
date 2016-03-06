@@ -31,9 +31,10 @@ public class Generator : MonoBehaviour {
 
     private Cell[,] cells;
     private List<Room> Rooms = new List<Room>();
+    private List<Line> hallways;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         Generate();
 	}
 	
@@ -55,12 +56,34 @@ public class Generator : MonoBehaviour {
         // Rooms.Add(new Room(4, 4, 3, 3));
 
         GenerateRooms();
-        GenerateCoridoors(Rooms);
+        GenerateCoridoors(ref Rooms, out hallways);
         /*
+        SetCoridoorCells();
         MakeDoors();
         */
-
+        foreach (Room thisRoom in Rooms)
+        {
+            Debug.Log(thisRoom.Origin.ToString());
+        }
+        foreach (Line hallway in hallways)
+        {
+            Debug.DrawLine(hallway.Origin1v3 * TILE_SIZE, hallway.Origin2v3 * TILE_SIZE, Color.cyan, 1000f, false);
+        }
         MakeTiles();
+    }
+
+    private void SetCoridoorCells()
+    {
+        for (int y = 0; y < HEIGHT; y++)
+        {
+            for (int x = 0; x < WIDTH; x++)
+            {
+                foreach (Line hallway in hallways)
+                {
+
+                }
+            }
+        }
     }
 
     private void MakeTiles()
@@ -133,25 +156,45 @@ public class Generator : MonoBehaviour {
         throw new NotImplementedException();
     }
 
-    private void GenerateCoridoors(List<Room> _Rooms)
+    private void GenerateCoridoors(ref List<Room> _Rooms, out List<Line> _hallways)
     {
-        List<Line> hallways = new List<Line>();
-        while(_Rooms.Count > 1)
+        _hallways = new List<Line>();
+        // first room is starting point so dont do anything
+        for (int i = 1; i < _Rooms.Count; i++)
         {
-            Room currentRoom = _Rooms[0];
-            _Rooms.RemoveAt(0);
-            Room lastClosestRoom;
-            float shortestDistance = Mathf.Infinity;
-            foreach (Room checkRoom in _Rooms)
+            // as this is the second room, we assume it's the closest room yet
+            int closestRoom = i;
+            float closestDistance = Vector2.Distance(_Rooms[i-1].Origin, _Rooms[i].Origin);
+            // check distance to all other rooms
+            for (int j = i + 1; j < _Rooms.Count; j++)
             {
-                float distance = (int)Vector2.Distance(currentRoom.Origin, checkRoom.Origin);
-                if (distance < shortestDistance)
+                float currentDistance = Vector2.Distance(_Rooms[j].Origin, _Rooms[i].Origin);
+                if (currentDistance < closestDistance)
                 {
-                    shortestDistance = distance;
-                    lastClosestRoom = checkRoom;
+                    closestDistance = currentDistance;
+                    closestRoom = j;
                 }
             }
+            // make the closest room the second in the list
+            if(closestRoom != i)
+            {
+                SwapRooms(ref _Rooms, i, closestRoom);
+            }
+            // repeat for all of the rooms
         }
+        // the rooms are now sorted in an order
+        // now make hallways between the rooms
+        for (int i = 1; i < _Rooms.Count; i++)
+        {
+            _hallways.Add(new Line(_Rooms[i - 1].Origin, _Rooms[i].Origin));
+        }
+    }
+
+    private void SwapRooms(ref List<Room> _Rooms, int i, int closestRoom)
+    {
+        Room swapRoom = _Rooms[i];
+        _Rooms[i] = _Rooms[closestRoom];
+        _Rooms[closestRoom] = swapRoom;
     }
 
     private void GenerateRooms()
@@ -183,7 +226,7 @@ public class Generator : MonoBehaviour {
                     }
                 }
 
-                Debug.Log(isValid.ToString() + newRoom.X + ", "  + newRoom.Y + ", " + (newRoom.Width + newRoom.X).ToString() + ", " + (newRoom.Height + newRoom.Y).ToString());
+                // Debug.Log(isValid.ToString() + newRoom.X + ", "  + newRoom.Y + ", " + (newRoom.Width + newRoom.X).ToString() + ", " + (newRoom.Height + newRoom.Y).ToString());
 
                 if (isValid)
                 {

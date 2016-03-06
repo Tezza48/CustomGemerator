@@ -92,7 +92,7 @@ class Room
         return tile;
     }
 
-    public bool DoesOverlap(Room _checkRoom)
+    /* public bool DoesOverlap(Room _checkRoom)
     {
 
         bool bottomLeft = RoomContains(_checkRoom.X, _checkRoom.Y);
@@ -109,4 +109,5 @@ class Room
             return false;
         }
     }
+    */
 }
