@@ -59,6 +59,7 @@ public class Generator : MonoBehaviour {
         GenerateCoridoors(ref Rooms, out hallways);
         /*
         SetCoridoorCells();
+        GenerateMaze();
         MakeDoors();
         */
         foreach (Room thisRoom in Rooms)
@@ -74,15 +75,9 @@ public class Generator : MonoBehaviour {
 
     private void SetCoridoorCells()
     {
-        for (int y = 0; y < HEIGHT; y++)
+        foreach (Line hallway in hallways)
         {
-            for (int x = 0; x < WIDTH; x++)
-            {
-                foreach (Line hallway in hallways)
-                {
 
-                }
-            }
         }
     }
 
