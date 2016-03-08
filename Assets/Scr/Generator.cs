@@ -135,32 +135,38 @@ public class Generator : MonoBehaviour {
                     }
                     break;
                 case Line.LineStyle.HorizFirst:
-                    //if (dx > 0) // if x right
-                    //{
-                    //    for (int x = startPos[0]; x < endPos[0] - 1; x++)
-                    //    {
-                    //        cells[x, startPos[1]].Exits |= (int)Exit.Left + (int)Exit.Right;
-                    //    }
-                    //    cells[endPos[0], startPos[1]].Exits |= (int)InverseExit.Right;
-                    //}
-                    //else // if x left
-                    //{
-                    //    for (int x = startPos[0]; x > endPos[0] + 1; x--)
-                    //    {
-                    //        cells[x, startPos[1]].Exits |= (int)Exit.Left + (int)Exit.Right;
-                    //    }
-                    //    cells[endPos[0], startPos[1]].Exits |= (int)InverseExit.Left;
-                    //}
-                    //if (dy > 0) // if y up
-                    //{
-                    //    cells[endPos[0], startPos[1]].Exits |= (int)InverseExit.Up;
-
-                    //}
-                    //else// if y down
-                    //{
-                    //    cells[endPos[0], startPos[1]].Exits |= (int)InverseExit.Down;
-
-                    //}
+                    if (dx > 0) // if x right
+                    {
+                        for (int x = startPos[0]; x < endPos[0] - 1; x++)
+                        {
+                            cells[x, startPos[1]].Exits |= (int)Exit.Left + (int)Exit.Right;
+                        }
+                        cells[endPos[0], startPos[1]].Exits |= (int)InverseExit.Right;
+                    }
+                    else // if x left
+                    {
+                        for (int x = startPos[0]; x > endPos[0] + 1; x--)
+                        {
+                            cells[x, startPos[1]].Exits |= (int)Exit.Left + (int)Exit.Right;
+                        }
+                        cells[endPos[0], startPos[1]].Exits |= (int)InverseExit.Left;
+                    }
+                    if (dy > 0) // if y up
+                    {
+                        cells[endPos[0], startPos[1]].Exits |= (int)InverseExit.Up;
+                        for (int y = startPos[1]; y < endPos[1] - 1; y++)
+                        {
+                            cells[endPos[0], y].Exits |= (int)Exit.Up + (int)Exit.Down;
+                        }
+                    }
+                    else// if y down
+                    {
+                        cells[endPos[0], startPos[1]].Exits |= (int)InverseExit.Down;
+                        for (int y = startPos[1]; y > endPos[1] + 1; y--)
+                        {
+                            cells[endPos[1], y].Exits |= (int)Exit.Up + (int)Exit.Down;
+                        }
+                    }
                     break;
                 default:
                     break;
@@ -193,7 +199,7 @@ public class Generator : MonoBehaviour {
                     }
                 }
 
-                currentRoom = null;
+                //currentRoom = null;
 
                 if (currentRoom != null)
                 {

@@ -23,6 +23,11 @@ class Cell
         }
     }
     
+    public static int getCellRotation (int _exits)
+    {
+        return 0;
+    }
+
     public int getNumExits()
     {
         int _exitCount = 0;
