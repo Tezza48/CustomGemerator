@@ -99,25 +99,68 @@ public class Generator : MonoBehaviour {
             switch (hallway.getLineStyle())
             {
                 case Line.LineStyle.VertFirst:
-                    for (int y = startPos[1]; y != endPos[1]; y += isPosY)
+                    // vertical
+                    if (dy > 0) // if y up
                     {
-                        cells[startPos[0], y].Exits |= (int) Exit.Down + (int) Exit.Up;
+                        for (int y = startPos[1]; y < endPos[1] - 1; y++)
+                        {
+                            cells[startPos[0], y].Exits |= (int)Exit.Down + (int)Exit.Up;
+                        }
+                        cells[startPos[0], endPos[1]].Exits |= (int)InverseExit.Up;
                     }
-
-                    for (int x = startPos[0] + 1; x != endPos[0]; x += isPosX)
+                    else // if y down
                     {
-                        cells[x, endPos[1]].Exits |= (int)Exit.Left + (int)Exit.Right;
+                        for (int y = startPos[1]; y > endPos[1] + 1; y--)
+                        {
+                            cells[startPos[0], y].Exits |= (int)Exit.Down + (int)Exit.Up;
+                        }
+                        cells[startPos[0], endPos[1]].Exits |= (int)InverseExit.Down;
+                    }
+                    // horizontal
+                    if (dx > 0) // if x right
+                    {
+                        cells[startPos[0], endPos[1]].Exits |= (int)InverseExit.Right;
+                        for (int x = startPos[0]; x < endPos[0] - 1; x++)
+                        {
+                            cells[x, endPos[1]].Exits |= (int)Exit.Left + (int)Exit.Right;
+                        }
+                    }
+                    else // if x left
+                    {
+                        cells[startPos[0], endPos[1]].Exits |= (int)InverseExit.Left;
+                        for (int x = startPos[0]; x > endPos[0] + 1; x--)
+                        {
+                            cells[x, endPos[1]].Exits |= (int)Exit.Left + (int)Exit.Right;
+                        }
                     }
                     break;
                 case Line.LineStyle.HorizFirst:
-                    for (int x = startPos[0]; x != endPos[0]; x += isPosX)
-                    {
-                        cells[x, startPos[1]].Exits |= (int)Exit.Left + (int)Exit.Right;
-                    }
-                    for (int y = startPos[1] + 1; y != endPos[1]; y += isPosY)
-                    {
-                        cells[endPos[0], y].Exits |= (int)Exit.Down + (int)Exit.Up;
-                    }
+                    //if (dx > 0) // if x right
+                    //{
+                    //    for (int x = startPos[0]; x < endPos[0] - 1; x++)
+                    //    {
+                    //        cells[x, startPos[1]].Exits |= (int)Exit.Left + (int)Exit.Right;
+                    //    }
+                    //    cells[endPos[0], startPos[1]].Exits |= (int)InverseExit.Right;
+                    //}
+                    //else // if x left
+                    //{
+                    //    for (int x = startPos[0]; x > endPos[0] + 1; x--)
+                    //    {
+                    //        cells[x, startPos[1]].Exits |= (int)Exit.Left + (int)Exit.Right;
+                    //    }
+                    //    cells[endPos[0], startPos[1]].Exits |= (int)InverseExit.Left;
+                    //}
+                    //if (dy > 0) // if y up
+                    //{
+                    //    cells[endPos[0], startPos[1]].Exits |= (int)InverseExit.Up;
+
+                    //}
+                    //else// if y down
+                    //{
+                    //    cells[endPos[0], startPos[1]].Exits |= (int)InverseExit.Down;
+
+                    //}
                     break;
                 default:
                     break;
@@ -149,6 +192,9 @@ public class Generator : MonoBehaviour {
                         break;
                     }
                 }
+
+                currentRoom = null;
+
                 if (currentRoom != null)
                 {
                     tile = currentRoom.CheckPosition(ref spawnOrientation, x, y);
@@ -208,8 +254,8 @@ public class Generator : MonoBehaviour {
                     switch (exits)
                     {
                         case 0:
-                            // newTile = CoridoorTilePrefabs[(int)MazeTiles.Filler];
-                            newTile = new GameObject("Error Tile");
+                            //newTile = CoridoorTilePrefabs[(int)MazeTiles.Filler];
+                            newTile = null;
                             break;
                         case 1:
                             newTile = CoridoorTilePrefabs[(int)MazeTiles.Deadend];
@@ -234,12 +280,16 @@ public class Generator : MonoBehaviour {
                             newTile = CoridoorTilePrefabs[(int)MazeTiles.Cross];
                             break;
                         default:
-                            newTile = new GameObject("Error Tile");
+                            //newTile = new GameObject("Error Tile");
+                            newTile = null;
                             break;
                     }
                 }
-                GameObject spawnedTile = (GameObject) Instantiate(newTile, spawnPos, Quaternion.Euler(0f, 90*spawnOrientation ,0f));
-                spawnedTile.name = "(" + x + ", " + y + ") " + newTile.name;
+                if (newTile != null)
+                {
+                    GameObject spawnedTile = (GameObject) Instantiate(newTile, spawnPos, Quaternion.Euler(0f, 90*spawnOrientation ,0f));
+                    spawnedTile.name = "(" + x + ", " + y + ") " + newTile.name;
+                }
             }
         }
     }

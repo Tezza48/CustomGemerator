@@ -22,7 +22,7 @@ class Cell
             exits = value;
         }
     }
-
+    
     public int getNumExits()
     {
         int _exitCount = 0;
