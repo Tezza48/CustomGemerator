@@ -31,14 +31,7 @@ class Room
 
     public bool RoomContains(int _x, int _y)
     {
-        if (_x >= x && _x <= x + width)
-        {
-            if (_y >= y && _y <= y + height)
-            {
-                return true;
-            }
-        }
-        return false;
+        return RoomRect.Contains(new Vector2(_x, _y));
     }
 
     public RoomTiles CheckPosition(ref int orientation, int _x, int _y)

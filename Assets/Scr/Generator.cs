@@ -204,6 +204,7 @@ public class Generator : MonoBehaviour {
                 if (currentRoom != null)
                 {
                     tile = currentRoom.CheckPosition(ref spawnOrientation, x, y);
+                    #region EdgeHandeling
                     if (tile == RoomTiles.Edge)
                     {
                         switch (spawnOrientation)
@@ -252,6 +253,29 @@ public class Generator : MonoBehaviour {
                                 break;
                         }
                     }
+                    #endregion
+                    #region CornerHandeling
+                    else if (tile == RoomTiles.Corner)
+                    {
+                        /*
+                            if top right
+                                
+                        */
+                        switch (spawnOrientation)
+                        {
+                            case 0:
+                                break;
+                            case 1:
+                                break;
+                            case 2:
+                                break;
+                            case 3:
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    #endregion
                     newTile = RoomTilePrefabs[(int)tile];
                 }
                 else
