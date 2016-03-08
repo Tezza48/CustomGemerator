@@ -57,23 +57,27 @@ public class Generator : MonoBehaviour {
                 cells[x, y] = new Cell();
             }
         }
-        // Rooms.Add(new Room(4, 4, 3, 3));
+        //Rooms.Add(new Room(0, 0, 6, 6));
+        //Rooms.Add(new Room(0, 10, 6, 6));
 
         GenerateRooms();
         GenerateCoridoors(ref Rooms, out hallways);
         SetCoridoorCells();
+
         /*
         GenerateMaze();
         MakeDoors();
         */
-        foreach (Room thisRoom in Rooms)
-        {
-            Debug.Log(thisRoom.Origin.ToString());
-        }
-        foreach (Line hallway in hallways)
-        {
-            Debug.DrawLine(hallway.Origin1v3 * TILE_SIZE, hallway.Origin2v3 * TILE_SIZE, Color.cyan, 1000f, false);
-        }
+
+        //foreach (Room thisRoom in Rooms)
+        //{
+        //    Debug.Log(thisRoom.Origin.ToString());
+        //}
+        //foreach (Line hallway in hallways)
+        //{
+        //    Debug.DrawLine(hallway.Origin1v3 * TILE_SIZE, hallway.Origin2v3 * TILE_SIZE, Color.cyan, 1000f, false);
+        //}
+
         MakeTiles();
     }
 
@@ -145,48 +149,58 @@ public class Generator : MonoBehaviour {
                         break;
                     }
                 }
-
-
-                // currentRoom = null; // REMOVE THIS TO GET ROOMS
-
-
                 if (currentRoom != null)
                 {
                     tile = currentRoom.CheckPosition(ref spawnOrientation, x, y);
-                    newTile = RoomTilePrefabs[(int)tile];
-                    if (tile == RoomTiles.Edge && x > 0 && y > 0 && x < WIDTH - 1 && y < HEIGHT - 1)
+                    if (tile == RoomTiles.Edge)
                     {
                         switch (spawnOrientation)
                         {
                             case 0:
-                                if ((cells[x, y+1].Exits & (int) Exit.Left) == (int) Exit.Left)
+                                if (y < HEIGHT - 1)
                                 {
-                                    tile = RoomTiles.DoorEdge;
+                                    if ((cells[x, y+1].Exits & (int) Exit.Up) == (int) Exit.Up)
+                                    {
+                                        tile = RoomTiles.DoorEdge;
+                                        spawnOrientation--;
+                                    }
+                                }
+                                break;
+                            case 1:
+                                if (x < WIDTH - 1)
+                                {
+                                    if ((cells[x + 1, y].Exits & (int)Exit.Left) == (int)Exit.Left)
+                                    {
+                                        tile = RoomTiles.DoorEdge;
+                                        spawnOrientation--;
+                                    }
                                 }
                                 break;
                             case 2:
-                                if ((cells[x, y - 1].Exits & (int)Exit.Right) == (int)Exit.Right)
+                                if (y > 0)
                                 {
-                                    tile = RoomTiles.DoorEdge;
+                                    if ((cells[x, y - 1].Exits & (int)Exit.Up) == (int)Exit.Up)
+                                    {
+                                        tile = RoomTiles.DoorEdge;
+                                        spawnOrientation--;
+                                    }
                                 }
                                 break;
                             case 3:
-                                if ((cells[x - 1, y].Exits & (int)Exit.Up) == (int)Exit.Up)
+                                if (x > 0)
                                 {
-                                    tile = RoomTiles.DoorEdge;
+                                    if ((cells[x - 1, y].Exits & (int)Exit.Right) == (int)Exit.Right)
+                                    {
+                                        tile = RoomTiles.DoorEdge;
+                                        spawnOrientation--;
+                                    }
                                 }
                                 break;
-                            case 4:
-                                if ((cells[x + 1, y].Exits & (int)Exit.Down) == (int)Exit.Down)
-                                {
-                                    tile = RoomTiles.DoorEdge;
-                                }
-                                break;
-
                             default:
                                 break;
                         }
                     }
+                    newTile = RoomTilePrefabs[(int)tile];
                 }
                 else
                 {
@@ -194,7 +208,8 @@ public class Generator : MonoBehaviour {
                     switch (exits)
                     {
                         case 0:
-                            newTile = CoridoorTilePrefabs[(int)MazeTiles.Filler];
+                            // newTile = CoridoorTilePrefabs[(int)MazeTiles.Filler];
+                            newTile = new GameObject("Error Tile");
                             break;
                         case 1:
                             newTile = CoridoorTilePrefabs[(int)MazeTiles.Deadend];
