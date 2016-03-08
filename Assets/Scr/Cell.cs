@@ -27,10 +27,10 @@ class Cell
     {
         int _exitCount = 0;
 
-        _exitCount += exits & (int)Exit.Up;
-        _exitCount += exits & (int)Exit.Right;
-        _exitCount += exits & (int)Exit.Down;
-        _exitCount += exits & (int)Exit.Left;
+        _exitCount += ((exits & (int)Exit.Up) == (int)Exit.Up) ? 1 : 0;
+        _exitCount += ((exits & (int)Exit.Right) == (int)Exit.Right) ? 1 : 0;
+        _exitCount += ((exits & (int)Exit.Down) == (int)Exit.Down) ? 1 : 0;
+        _exitCount += ((exits & (int)Exit.Left) == (int)Exit.Left) ? 1 : 0;
 
         return _exitCount;
     }

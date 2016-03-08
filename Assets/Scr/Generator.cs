@@ -10,7 +10,11 @@ enum MazeTiles
 
 enum RoomTiles
 {
-    Corner = 8, Centre = 0, Edge = 5
+    Centre,
+    Edge,
+    Corner,
+    DoorEdge,
+    UNDEFINED
 }
 
 public class Generator : MonoBehaviour {
@@ -26,8 +30,8 @@ public class Generator : MonoBehaviour {
     [SerializeField][Range(8, 20)] private int maxRoomSize = 8;
 
     [Header("Tile Fields")]
-    public GameObject[] CoridoorTiles;
-    public GameObject[] RoomTiles;
+    public GameObject[] CoridoorTilePrefabs;
+    public GameObject[] RoomTilePrefabs;
 
     private Cell[,] cells;
     private List<Room> Rooms = new List<Room>();
@@ -57,8 +61,8 @@ public class Generator : MonoBehaviour {
 
         GenerateRooms();
         GenerateCoridoors(ref Rooms, out hallways);
-        /*
         SetCoridoorCells();
+        /*
         GenerateMaze();
         MakeDoors();
         */
@@ -77,7 +81,43 @@ public class Generator : MonoBehaviour {
     {
         foreach (Line hallway in hallways)
         {
+            int[] startPos = new int[] { (int)hallway.O1.x, (int)hallway.O1.y };
+            int[] endPos = new int[] { (int)hallway.O2.x, (int)hallway.O2.y };
 
+            int dx = endPos[0] - startPos[0];
+            int dy = endPos[1] - startPos[1];
+
+            int isPosX = dx > 0 ? 1 : -1;
+            int isPosY = dy > 0 ? 1 : -1;
+            
+            //which way do i go first?
+
+            switch (hallway.getLineStyle())
+            {
+                case Line.LineStyle.VertFirst:
+                    for (int y = startPos[1]; y != endPos[1]; y += isPosY)
+                    {
+                        cells[startPos[0], y].Exits |= (int) Exit.Down + (int) Exit.Up;
+                    }
+
+                    for (int x = startPos[0] + 1; x != endPos[0]; x += isPosX)
+                    {
+                        cells[x, endPos[1]].Exits |= (int)Exit.Left + (int)Exit.Right;
+                    }
+                    break;
+                case Line.LineStyle.HorizFirst:
+                    for (int x = startPos[0]; x != endPos[0]; x += isPosX)
+                    {
+                        cells[x, startPos[1]].Exits |= (int)Exit.Left + (int)Exit.Right;
+                    }
+                    for (int y = startPos[1] + 1; y != endPos[1]; y += isPosY)
+                    {
+                        cells[endPos[0], y].Exits |= (int)Exit.Down + (int)Exit.Up;
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
@@ -85,7 +125,7 @@ public class Generator : MonoBehaviour {
     {
         Vector3 spawnPos;
         int spawnOrientation = 0;
-        GameObject newTile = CoridoorTiles[0];
+        GameObject newTile = CoridoorTilePrefabs[0];
         Cell currentCell;
         for (int y = 0; y < HEIGHT; y++)
         {
@@ -93,6 +133,7 @@ public class Generator : MonoBehaviour {
             {
                 spawnPos = new Vector3(x * TILE_SIZE, 0, y * TILE_SIZE);
                 spawnOrientation = 0;
+                RoomTiles tile = RoomTiles.UNDEFINED;
                 newTile = null;
                 currentCell = cells[x, y];
                 Room currentRoom = null;
@@ -104,36 +145,78 @@ public class Generator : MonoBehaviour {
                         break;
                     }
                 }
+
+
+                // currentRoom = null; // REMOVE THIS TO GET ROOMS
+
+
                 if (currentRoom != null)
                 {
-                    RoomTiles tile = currentRoom.CheckPosition(ref spawnOrientation, x, y);
-                    newTile = RoomTiles[(int)tile];
+                    tile = currentRoom.CheckPosition(ref spawnOrientation, x, y);
+                    newTile = RoomTilePrefabs[(int)tile];
+                    if (tile == RoomTiles.Edge && x > 0 && y > 0 && x < WIDTH - 1 && y < HEIGHT - 1)
+                    {
+                        switch (spawnOrientation)
+                        {
+                            case 0:
+                                if ((cells[x, y+1].Exits & (int) Exit.Left) == (int) Exit.Left)
+                                {
+                                    tile = RoomTiles.DoorEdge;
+                                }
+                                break;
+                            case 2:
+                                if ((cells[x, y - 1].Exits & (int)Exit.Right) == (int)Exit.Right)
+                                {
+                                    tile = RoomTiles.DoorEdge;
+                                }
+                                break;
+                            case 3:
+                                if ((cells[x - 1, y].Exits & (int)Exit.Up) == (int)Exit.Up)
+                                {
+                                    tile = RoomTiles.DoorEdge;
+                                }
+                                break;
+                            case 4:
+                                if ((cells[x + 1, y].Exits & (int)Exit.Down) == (int)Exit.Down)
+                                {
+                                    tile = RoomTiles.DoorEdge;
+                                }
+                                break;
+
+                            default:
+                                break;
+                        }
+                    }
                 }
                 else
                 {
-                    switch (currentCell.getNumExits())
+                    int exits = currentCell.getNumExits();
+                    switch (exits)
                     {
                         case 0:
-                            newTile = CoridoorTiles[(int)MazeTiles.Filler];
+                            newTile = CoridoorTilePrefabs[(int)MazeTiles.Filler];
                             break;
                         case 1:
-                            newTile = CoridoorTiles[(int)MazeTiles.Deadend];
+                            newTile = CoridoorTilePrefabs[(int)MazeTiles.Deadend];
                             break;
                         case 2:
                             if (currentCell.Exits == 10 || currentCell.Exits == 5)
                             {
-                                newTile = CoridoorTiles[(int)MazeTiles.Straight];
+                                newTile = CoridoorTilePrefabs[(int)MazeTiles.Straight];
+
+                                // if it's up / down, make the orientation = 1
+                                spawnOrientation = (currentCell.Exits & (int)Exit.Up) == (int)Exit.Up ? 0 : 1;
                             }
                             else
                             {
-                                newTile = CoridoorTiles[(int)MazeTiles.Corner];
+                                newTile = CoridoorTilePrefabs[(int)MazeTiles.Corner];
                             }
                             break;
                         case 3:
-                            newTile = CoridoorTiles[(int)MazeTiles.Junction];
+                            newTile = CoridoorTilePrefabs[(int)MazeTiles.Junction];
                             break;
                         case 4:
-                            newTile = CoridoorTiles[(int)MazeTiles.Cross];
+                            newTile = CoridoorTilePrefabs[(int)MazeTiles.Cross];
                             break;
                         default:
                             newTile = new GameObject("Error Tile");
