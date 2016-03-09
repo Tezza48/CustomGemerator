@@ -2,80 +2,75 @@
 
 class Room
 {
-    private int x, y, width, height;
 
-    private Vector2 origin;
+    private Rect roomRect;
 
     #region Properties
-    public int Height { get { return height; } }
+    public int Height { get { return (int)roomRect.height; } }
 
-    public int Width { get { return width; } }
+    public int Width { get { return (int)roomRect.width; } }
 
-    public int X { get { return x; } }
+    public int X { get { return (int)roomRect.x; } }
 
-    public int Y { get { return y; } }
+    public int Y { get { return (int)roomRect.y; } }
 
-    public Rect RoomRect { get { return new Rect(x-1, y-1, width+2, height+2);  } }
+    public Rect RoomRect { get { return roomRect;  } }
 
-    public Vector2 Origin { get { return origin; } }
+    public Vector2 Origin { get { return roomRect.center; } }
     #endregion
 
     public Room(int _x, int _y, int _width, int _height)
     {
-        x = _x;
-        y = _y;
-        width = _width;
-        height = _height;
-        origin = new Vector2( x + (width / 2), y + (height/2) );
+        roomRect = new Rect(_x, _y, _width, _height);
     }
 
     public bool RoomContains(int _x, int _y)
     {
-        return RoomRect.Contains(new Vector2(_x, _y));
+        return roomRect.Contains(new Vector2(_x, _y));
     }
 
     public RoomTiles CheckPosition(ref int orientation, int _x, int _y)
     {
         RoomTiles tile = RoomTiles.Centre;
         // if corner
-        if (_x == x && _y == y)
+        if (_x == X && _y == Y)
         {
             orientation = 3;
             return RoomTiles.Corner;
         }
-        else if (_x == x + width && _y == y)
+        else if (_x == X + Width && _y == Y)
         {
             orientation = 2;
             return RoomTiles.Corner;
         }
-        else if (_x == x && _y == y + height)
+        else if (_x == X && _y == Y + Height)
         {
             orientation = 0;
             return RoomTiles.Corner;
         }
-        else if (_x == x + width && _y == y + height)
+        else if (_x == X + Width && _y == Y + Height)
         {
             orientation = 1;
             return RoomTiles.Corner;
         }
 
         // if edge
-        else if (_x == x)
+        else if (_x == X)
         {
             orientation = 3;
             return RoomTiles.Edge;
         }
-        else if (_y == y)
+        else if (_y == Y)
         {
             orientation = 2;
             return RoomTiles.Edge;
         }
-        else if (_x == x + width)
+        else if (_x == X + Width)
         {
             orientation = 1;
             return RoomTiles.Edge;
         }
-        else if (_y == y + height)
+        else if (_y == Y + Height)
         {
             orientation = 0;
             return RoomTiles.Edge;

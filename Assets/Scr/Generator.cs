@@ -73,10 +73,10 @@ public class Generator : MonoBehaviour {
         //{
         //    Debug.Log(thisRoom.Origin.ToString());
         //}
-        //foreach (Line hallway in hallways)
-        //{
-        //    Debug.DrawLine(hallway.Origin1v3 * TILE_SIZE, hallway.Origin2v3 * TILE_SIZE, Color.cyan, 1000f, false);
-        //}
+        foreach (Line hallway in hallways)
+        {
+            Debug.DrawLine(hallway.Origin1v3 * TILE_SIZE, hallway.Origin2v3 * TILE_SIZE, Color.cyan, 1000f, false);
+        }
 
         MakeTiles();
     }
@@ -176,152 +176,7 @@ public class Generator : MonoBehaviour {
 
     private void MakeTiles()
     {
-        Vector3 spawnPos;
-        int spawnOrientation = 0;
-        GameObject newTile = CoridoorTilePrefabs[0];
-        Cell currentCell;
-        for (int y = 0; y < HEIGHT; y++)
-        {
-            for (int x = 0; x < WIDTH; x++)
-            {
-                spawnPos = new Vector3(x * TILE_SIZE, 0, y * TILE_SIZE);
-                spawnOrientation = 0;
-                RoomTiles tile = RoomTiles.UNDEFINED;
-                newTile = null;
-                currentCell = cells[x, y];
-                Room currentRoom = null;
-                foreach (Room checkRoom in Rooms)
-                {
-                    if (checkRoom.RoomContains(x, y))
-                    {
-                        currentRoom = checkRoom;
-                        break;
-                    }
-                }
-
-                //currentRoom = null;
-
-                if (currentRoom != null)
-                {
-                    tile = currentRoom.CheckPosition(ref spawnOrientation, x, y);
-                    #region EdgeHandeling
-                    if (tile == RoomTiles.Edge)
-                    {
-                        switch (spawnOrientation)
-                        {
-                            case 0:
-                                if (y < HEIGHT - 1)
-                                {
-                                    if ((cells[x, y+1].Exits & (int) Exit.Up) == (int) Exit.Up)
-                                    {
-                                        tile = RoomTiles.DoorEdge;
-                                        spawnOrientation--;
-                                    }
-                                }
-                                break;
-                            case 1:
-                                if (x < WIDTH - 1)
-                                {
-                                    if ((cells[x + 1, y].Exits & (int)Exit.Left) == (int)Exit.Left)
-                                    {
-                                        tile = RoomTiles.DoorEdge;
-                                        spawnOrientation--;
-                                    }
-                                }
-                                break;
-                            case 2:
-                                if (y > 0)
-                                {
-                                    if ((cells[x, y - 1].Exits & (int)Exit.Up) == (int)Exit.Up)
-                                    {
-                                        tile = RoomTiles.DoorEdge;
-                                        spawnOrientation--;
-                                    }
-                                }
-                                break;
-                            case 3:
-                                if (x > 0)
-                                {
-                                    if ((cells[x - 1, y].Exits & (int)Exit.Right) == (int)Exit.Right)
-                                    {
-                                        tile = RoomTiles.DoorEdge;
-                                        spawnOrientation--;
-                                    }
-                                }
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    #endregion
-                    #region CornerHandeling
-                    else if (tile == RoomTiles.Corner)
-                    {
-                        /*
-                            if top right
-                                
-                        */
-                        switch (spawnOrientation)
-                        {
-                            case 0:
-                                break;
-                            case 1:
-                                break;
-                            case 2:
-                                break;
-                            case 3:
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    #endregion
-                    newTile = RoomTilePrefabs[(int)tile];
-                }
-                else
-                {
-                    int exits = currentCell.getNumExits();
-                    switch (exits)
-                    {
-                        case 0:
-                            //newTile = CoridoorTilePrefabs[(int)MazeTiles.Filler];
-                            newTile = null;
-                            break;
-                        case 1:
-                            newTile = CoridoorTilePrefabs[(int)MazeTiles.Deadend];
-                            break;
-                        case 2:
-                            if (currentCell.Exits == 10 || currentCell.Exits == 5)
-                            {
-                                newTile = CoridoorTilePrefabs[(int)MazeTiles.Straight];
-
-                                // if it's up / down, make the orientation = 1
-                                spawnOrientation = (currentCell.Exits & (int)Exit.Up) == (int)Exit.Up ? 0 : 1;
-                            }
-                            else
-                            {
-                                newTile = CoridoorTilePrefabs[(int)MazeTiles.Corner];
-                            }
-                            break;
-                        case 3:
-                            newTile = CoridoorTilePrefabs[(int)MazeTiles.Junction];
-                            break;
-                        case 4:
-                            newTile = CoridoorTilePrefabs[(int)MazeTiles.Cross];
-                            break;
-                        default:
-                            //newTile = new GameObject("Error Tile");
-                            newTile = null;
-                            break;
-                    }
-                }
-                if (newTile != null)
-                {
-                    GameObject spawnedTile = (GameObject) Instantiate(newTile, spawnPos, Quaternion.Euler(0f, 90*spawnOrientation ,0f));
-                    spawnedTile.name = "(" + x + ", " + y + ") " + newTile.name;
-                }
-            }
-        }
+        throw new NotImplementedException("Havent-re done this yet dummy!");
     }
 
     private void MakeDoors()
