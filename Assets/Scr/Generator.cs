@@ -57,27 +57,40 @@ public class Generator : MonoBehaviour {
                 cells[x, y] = new Cell();
             }
         }
-        //Rooms.Add(new Room(0, 0, 6, 6));
-        //Rooms.Add(new Room(0, 10, 6, 6));
+        // Rooms.Add(new Room(4, 4, 3, 3));
 
         GenerateRooms();
         GenerateCoridoors(ref Rooms, out hallways);
+<<<<<<< HEAD
 
+=======
+        SetCoridoorCells();
+>>>>>>> parent of 59ae842... WORKING! Corners are an issue.
         /*
         SetCorridorCells();
         GenerateMaze();
         MakeDoors();
         */
+<<<<<<< HEAD
 
         //foreach (Room thisRoom in Rooms)
         //{
         //    Debug.Log(thisRoom.Origin.ToString());
         //}
+=======
+        foreach (Room thisRoom in Rooms)
+        {
+            Debug.Log(thisRoom.Origin.ToString());
+        }
+>>>>>>> parent of 59ae842... WORKING! Corners are an issue.
         foreach (Line hallway in hallways)
         {
             Debug.DrawLine(hallway.Origin1v3 * TILE_SIZE, hallway.Origin2v3 * TILE_SIZE, Color.cyan, 1000f, false);
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> parent of 59ae842... WORKING! Corners are an issue.
         MakeTiles();
     }
 
@@ -180,11 +193,103 @@ public class Generator : MonoBehaviour {
         {
             for (int x = 0; x < WIDTH; x++)
             {
+<<<<<<< HEAD
                 foreach (Room currentRoom in Rooms)
+=======
+                spawnPos = new Vector3(x * TILE_SIZE, 0, y * TILE_SIZE);
+                spawnOrientation = 0;
+                RoomTiles tile = RoomTiles.UNDEFINED;
+                newTile = null;
+                currentCell = cells[x, y];
+                Room currentRoom = null;
+                foreach (Room checkRoom in Rooms)
+                {
+                    if (checkRoom.RoomContains(x, y))
+                    {
+                        currentRoom = checkRoom;
+                        break;
+                    }
+                }
+
+
+                // currentRoom = null; // REMOVE THIS TO GET ROOMS
+
+
+                if (currentRoom != null)
+                {
+                    tile = currentRoom.CheckPosition(ref spawnOrientation, x, y);
+                    newTile = RoomTilePrefabs[(int)tile];
+                    if (tile == RoomTiles.Edge && x > 0 && y > 0 && x < WIDTH - 1 && y < HEIGHT - 1)
+                    {
+                        switch (spawnOrientation)
+                        {
+                            case 0:
+                                if ((cells[x, y+1].Exits & (int) Exit.Left) == (int) Exit.Left)
+                                {
+                                    tile = RoomTiles.DoorEdge;
+                                }
+                                break;
+                            case 2:
+                                if ((cells[x, y - 1].Exits & (int)Exit.Right) == (int)Exit.Right)
+                                {
+                                    tile = RoomTiles.DoorEdge;
+                                }
+                                break;
+                            case 3:
+                                if ((cells[x - 1, y].Exits & (int)Exit.Up) == (int)Exit.Up)
+                                {
+                                    tile = RoomTiles.DoorEdge;
+                                }
+                                break;
+                            case 4:
+                                if ((cells[x + 1, y].Exits & (int)Exit.Down) == (int)Exit.Down)
+                                {
+                                    tile = RoomTiles.DoorEdge;
+                                }
+                                break;
+
+                            default:
+                                break;
+                        }
+                    }
+                }
+                else
+>>>>>>> parent of 59ae842... WORKING! Corners are an issue.
                 {
                     if (currentRoom.RoomRect.Contains( new Vector2(x, y) ) )
                     {
+<<<<<<< HEAD
                         Instantiate(CoridoorTilePrefabs[0], new Vector3(x * TILE_SIZE, 0, y * TILE_SIZE), Quaternion.identity);
+=======
+                        case 0:
+                            newTile = CoridoorTilePrefabs[(int)MazeTiles.Filler];
+                            break;
+                        case 1:
+                            newTile = CoridoorTilePrefabs[(int)MazeTiles.Deadend];
+                            break;
+                        case 2:
+                            if (currentCell.Exits == 10 || currentCell.Exits == 5)
+                            {
+                                newTile = CoridoorTilePrefabs[(int)MazeTiles.Straight];
+
+                                // if it's up / down, make the orientation = 1
+                                spawnOrientation = (currentCell.Exits & (int)Exit.Up) == (int)Exit.Up ? 0 : 1;
+                            }
+                            else
+                            {
+                                newTile = CoridoorTilePrefabs[(int)MazeTiles.Corner];
+                            }
+                            break;
+                        case 3:
+                            newTile = CoridoorTilePrefabs[(int)MazeTiles.Junction];
+                            break;
+                        case 4:
+                            newTile = CoridoorTilePrefabs[(int)MazeTiles.Cross];
+                            break;
+                        default:
+                            newTile = new GameObject("Error Tile");
+                            break;
+>>>>>>> parent of 59ae842... WORKING! Corners are an issue.
                     }
                 }
             }
