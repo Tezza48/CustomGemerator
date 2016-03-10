@@ -62,9 +62,9 @@ public class Generator : MonoBehaviour {
 
         GenerateRooms();
         GenerateCoridoors(ref Rooms, out hallways);
-        SetCoridoorCells();
 
         /*
+        SetCorridorCells();
         GenerateMaze();
         MakeDoors();
         */
@@ -81,7 +81,7 @@ public class Generator : MonoBehaviour {
         MakeTiles();
     }
 
-    private void SetCoridoorCells()
+    private void SetCorridorCells()
     {
         foreach (Line hallway in hallways)
         {
@@ -176,7 +176,19 @@ public class Generator : MonoBehaviour {
 
     private void MakeTiles()
     {
-        throw new NotImplementedException("Havent-re done this yet dummy!");
+        for (int y = 0; y < HEIGHT; y++)
+        {
+            for (int x = 0; x < WIDTH; x++)
+            {
+                foreach (Room currentRoom in Rooms)
+                {
+                    if (currentRoom.RoomRect.Contains( new Vector2(x, y) ) )
+                    {
+                        Instantiate(CoridoorTilePrefabs[0], new Vector3(x * TILE_SIZE, 0, y * TILE_SIZE), Quaternion.identity);
+                    }
+                }
+            }
+        }
     }
 
     private void MakeDoors()
@@ -247,7 +259,7 @@ public class Generator : MonoBehaviour {
                 bool isValid = true;
                 foreach (Room currentRoom in Rooms)
                 {
-                    if (newRoom.RoomRect.Overlaps(currentRoom.RoomRect))
+                    if (Room.RoomsOverlap(currentRoom, newRoom))
                     {
                         isValid = false;
                         break;

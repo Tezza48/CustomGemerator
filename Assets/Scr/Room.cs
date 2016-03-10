@@ -3,30 +3,30 @@
 class Room
 {
 
-    private Rect roomRect;
+    private Rect rect;
 
     #region Properties
-    public int Height { get { return (int)roomRect.height; } }
+    public int Height { get { return (int)rect.height; } }
 
-    public int Width { get { return (int)roomRect.width; } }
+    public int Width { get { return (int)rect.width; } }
 
-    public int X { get { return (int)roomRect.x; } }
+    public int X { get { return (int)rect.x; } }
 
-    public int Y { get { return (int)roomRect.y; } }
+    public int Y { get { return (int)rect.y; } }
 
-    public Rect RoomRect { get { return roomRect;  } }
+    public Rect RoomRect { get { return rect;  } }
 
-    public Vector2 Origin { get { return roomRect.center; } }
+    public Vector2 Origin { get { return rect.center; } }
     #endregion
 
     public Room(int _x, int _y, int _width, int _height)
     {
-        roomRect = new Rect(_x, _y, _width, _height);
+        rect = new Rect(_x, _y, _width, _height);
     }
 
-    public bool RoomContains(int _x, int _y)
+    public bool Contains(int _x, int _y)
     {
-        return roomRect.Contains(new Vector2(_x, _y));
+        return rect.Contains(new Vector2(_x, _y));
     }
 
     public RoomTiles CheckPosition(ref int orientation, int _x, int _y)
@@ -79,23 +79,18 @@ class Room
         orientation = UnityEngine.Random.Range(0, 4);
         return tile;
     }
-
-    /* public bool DoesOverlap(Room _checkRoom)
+    public static bool RoomsOverlap(Room roomA, Room roomB)
     {
+        roomA.rect.x--;
+        roomA.rect.y--;
+        roomA.rect.width++;
+        roomA.rect.height++;
 
-        bool bottomLeft = RoomContains(_checkRoom.X, _checkRoom.Y);
-        bool bottomRight = RoomContains(_checkRoom.Width, _checkRoom.Y);
-        bool topLeft = RoomContains(_checkRoom.X, _checkRoom.Height);
-        bool topRight = RoomContains(_checkRoom.Width, _checkRoom.Height);
+        roomB.rect.x--;
+        roomB.rect.y--;
+        roomB.rect.width++;
+        roomB.rect.height++;
 
-        if (bottomLeft || bottomRight || topLeft || topRight)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return roomA.rect.Overlaps(roomB.rect);
     }
-    */
 }
